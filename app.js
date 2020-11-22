@@ -13,7 +13,27 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(methodOverride('_method'))
 
 app.get('/', (req, res) => {
-  res.send('hello world')
+  res.render('index')
+})
+
+app.get('/users/login', (req, res) => {
+  res.render('login')
+})
+
+app.post('/users/login', (req, res) => {
+  res.send('login successfully')
+})
+
+app.get('/users/register', (req, res) => {
+  res.render('register')
+})
+
+app.post('/users/register', (req, res) => {
+  res.send('register successfully')
+})
+
+app.get('/users/logout', (req, res) => {
+  res.send('logout successfully')
 })
 
 app.listen(PORT, () => {
