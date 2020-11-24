@@ -114,12 +114,16 @@ app.get('/todos/:id', authenticator, (req, res) => {
 })
 
 app.get('/', authenticator, (req, res) => {
-  return Todo.findAll({
-    raw: true,
-    nest: true
-  })
-    .then((todos) => { return res.render('index', { todos: todos }) })
-    .catch((error) => { return res.status(422).json(error) })
+  const UserId = req.user.id
+  return Todo.findByPk(UserId)
+    .then(todo => res.render('index', { todo: todo.toJSON() }))
+    .catch(error => console.log(error))
+  // return Todo.findAll({
+  //   raw: true,
+  //   nest: true
+  // })
+  // .then((todos) => { return res.render('index', { todos: todos }) })
+  // .catch((error) => { return res.status(422).json(error) })
 })
 
 app.get('/auth/facebook', passport.authenticate('facebook', {
