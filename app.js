@@ -42,6 +42,18 @@ app.use((req, res, next) => {
   next()
 })
 
+app.get('/todos/new', (req, res) => {
+  return res.render('new')
+})
+
+app.post('/todos', (req, res) => {
+  const name = req.body.name
+  const UserId = req.user.id
+  return Todo.create({ name, UserId })
+    .then(() => res.redirect('/'))
+    .catch(error => console.log(error))
+})
+
 app.get('/users/login', (req, res) => {
   res.render('login')
 })
@@ -106,7 +118,7 @@ app.get('/users/logout', (req, res) => {
   res.redirect('/users/login')
 })
 
-app.get('/todos/:id', authenticator, (req, res) => {
+app.get('/todos/:id', (req, res) => {
   const id = req.params.id
   return Todo.findByPk(id)
     .then(todo => res.render('detail', { todo: todo.toJSON() }))
@@ -133,11 +145,6 @@ app.get('/auth/facebook/callback', passport.authenticate('facebook', {
   successRedirect: '/',
   failureRedirect: 'users/login'
 }))
-
-app.get('/todos/new', (req, res) => {
-  return res.render('new')
-})
-
 
 app.listen(process.env.PORT, () => {
   console.log(`App is running on http://localhost:${PORT}`)
