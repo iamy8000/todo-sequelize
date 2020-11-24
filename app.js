@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs')
 const session = require('express-session')
 const usePassport = require('./config/passport')
 const passport = require('passport')
+const flash = require('connect-flash')
 const { authenticator } = require('./middleware/auth')
 
 const db = require('./models')
@@ -28,9 +29,12 @@ app.use(methodOverride('_method'))
 
 usePassport(app)
 
+app.use(flash())
 app.use((req, res, next) => {
   res.locals.isAuthenticated = req.isAuthenticated()
   res.locals.user = req.user
+  res.locals.success_msg = req.flash('success_msg')  // 設定 success_msg 訊息
+  res.locals.warning_msg = req.flash('warning_msg')  // 設定 warning_msg 訊息
   next()
 })
 
@@ -49,10 +53,29 @@ app.get('/users/register', (req, res) => {
 
 app.post('/users/register', (req, res) => {
   const { name, email, password, confirmPassword } = req.body
+  const errors = []
+
+  if (!name || !email || !password || !confirmPassword) {
+    errors.push({ message: '所有欄位都是必填。' })
+  }
+  if (password !== confirmPassword) {
+    errors.push({ message: '密碼與確認密碼不相符！' })
+  }
+  if (errors.length) {
+    return res.render('register', {
+      errors,
+      name,
+      email,
+      password,
+      confirmPassword
+    })
+  }
+
   User.findOne({ where: { email } }).then(user => {
     if (user) {
-      console.log('User already exists')
+      errors.push({ message: '這個 Email 已經註冊過了。' })
       return res.render('register', {
+        errors,
         name,
         email,
         password,
@@ -75,6 +98,7 @@ app.post('/users/register', (req, res) => {
 
 app.get('/users/logout', (req, res) => {
   req.logout()
+  req.flash('success_msg', '你已經成功登出。')
   res.redirect('/users/login')
 })
 
