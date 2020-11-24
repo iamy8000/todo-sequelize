@@ -9,6 +9,10 @@ const passport = require('passport')
 const flash = require('connect-flash')
 const { authenticator } = require('./middleware/auth')
 
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config()
+}
+
 const db = require('./models')
 const Todo = db.Todo
 const User = db.User
@@ -118,6 +122,15 @@ app.get('/', authenticator, (req, res) => {
     .catch((error) => { return res.status(422).json(error) })
 })
 
-app.listen(PORT, () => {
+app.get('/auth/facebook', passport.authenticate('facebook', {
+  scope: ['email', 'public_profile']
+}))
+
+app.get('/auth/facebook/callback', passport.authenticate('facebook', {
+  successRedirect: '/',
+  failureRedirect: 'users/login'
+}))
+
+app.listen(process.env.PORT, () => {
   console.log(`App is running on http://localhost:${PORT}`)
 })
