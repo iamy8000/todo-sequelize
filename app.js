@@ -77,7 +77,8 @@ app.post('/users/register', (req, res) => {
 })
 
 app.get('/users/logout', (req, res) => {
-  res.send('logout successfully')
+  req.logout()
+  res.redirect('/users/login')
 })
 
 app.get('/todos/:id', (req, res) => {
