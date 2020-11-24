@@ -115,15 +115,14 @@ app.get('/todos/:id', authenticator, (req, res) => {
 
 app.get('/', authenticator, (req, res) => {
   const UserId = req.user.id
-  return Todo.findByPk(UserId)
-    .then(todo => res.render('index', { todo: todo.toJSON() }))
-    .catch(error => console.log(error))
-  // return Todo.findAll({
-  //   raw: true,
-  //   nest: true
-  // })
-  // .then((todos) => { return res.render('index', { todos: todos }) })
-  // .catch((error) => { return res.status(422).json(error) })
+  console.log(UserId)
+  return Todo.findAll({
+    where: { UserId },
+    raw: true,
+    nest: true
+  })
+    .then((todos) => { return res.render('index', { todos: todos }) })
+    .catch((error) => { return res.status(422).json(error) })
 })
 
 app.get('/auth/facebook', passport.authenticate('facebook', {
@@ -134,6 +133,11 @@ app.get('/auth/facebook/callback', passport.authenticate('facebook', {
   successRedirect: '/',
   failureRedirect: 'users/login'
 }))
+
+app.get('/todos/new', (req, res) => {
+  return res.render('new')
+})
+
 
 app.listen(process.env.PORT, () => {
   console.log(`App is running on http://localhost:${PORT}`)
