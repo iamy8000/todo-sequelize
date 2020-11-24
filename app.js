@@ -149,6 +149,16 @@ app.put('/todos/:id', (req, res) => {
     .catch(error => console.log(error))
 })
 
+app.delete('/todos/:id', (req, res) => {
+  const UserId = req.user.id
+  const id = req.params.id
+
+  return Todo.findOne({ where: { id, UserId } })
+    .then(todo => todo.destroy())
+    .then(() => res.redirect('/'))
+    .catch(error => console.log(error))
+})
+
 app.get('/', authenticator, (req, res) => {
   const UserId = req.user.id
   console.log(UserId)
